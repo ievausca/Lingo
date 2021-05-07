@@ -1,6 +1,8 @@
 
 --DB1 Words
-
+CREATE TABLE WORDS (
+  WORD_ID Integer PRIMARY KEY,
+  WORDS VARCHAR (5),
 
 
 --DB2 Users
