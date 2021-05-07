@@ -1,5 +1,21 @@
-CREATE TABLE UserInfo(
-  id INTEGER,
-  Username VARCHAR(15),
-  Name VARCHAR(20),
-  Age INTEGER,
+
+--DB1 Words
+
+
+
+--DB2 Users
+CREATE TABLE USERS (
+USER_ID Integer IDENTITY (1,1) PRIMARY KEY,
+USERNAME text NOT NULL (20),
+NAME text,
+AGE Integer
+);
+
+UPDATE USERS SET (USERNAME =?, NAME= ?, AGE= ?);
+
+SELECT COUNT (USERNAME) FROM USERS;
+
+
+
+--DB3 Results
+
