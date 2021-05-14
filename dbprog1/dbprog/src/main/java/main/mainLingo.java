@@ -19,18 +19,21 @@ public class mainLingo {
         return DriverManager.getConnection(DB_URL, USER, PASS);
     }
     private static final String DROP_TABLE = "DELETE FROM WORD_COLLECTION";
-    private static final String CREATE_TABLE = " CREATE TABLE if not exists WORD_COLLECTION  " +
+    private static final String CREATE_TABLE_WORDS = " CREATE TABLE if not exists WORD_COLLECTION  " +
             "(WORD_ID bigint auto_increment,WORD TEXT (10), PRIMARY KEY (WORD_ID));";
     private static final String INSERTCSV = "INSERT INTO WORD_COLLECTION (WORD) SELECT * FROM CSVREAD('C:\\Users\\Dell\\Desktop\\java\\Lingo\\dbprog1\\dbprog\\src\\main\\java\\main\\5bvardi1.csv')";
-
+    private static final String CREATE_TABLE_RESULTS = "CREATE TABLE IF NOT EXISTS RESULTS  (GAME_ID BIGINT AUTO_INCREMENT,USER_ID BIGINT,WORD_ID BIGINT,PRIMARY KEY (GAME_ID),FOREIGN KEY (USER_ID)  REFERENCES USERS (USER_ID),FOREIGN KEY (WORD_ID) REFERENCES WORD_COLLECTION (WORD_ID),GUESSES Integer,WON Integer);";
+    private static final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS USERS  (USER_ID BIGINT AUTO_INCREMENT,USERNAME text NOT NULL,NAME text  NOT NULL,AGE Integer NOT NULL,PRIMARY KEY (USER_ID));";
     public static void createTable () {
 
         try (Connection connection = getConnection()) {
             try (Statement statement = connection.createStatement()) {
 
-                statement.executeUpdate(CREATE_TABLE);
+                statement.executeUpdate(CREATE_TABLE_WORDS);
                 statement.executeUpdate(DROP_TABLE);
                 statement.executeUpdate(INSERTCSV);
+                statement.executeUpdate(CREATE_TABLE_USERS);
+                statement.executeUpdate(CREATE_TABLE_RESULTS);
             }
         } catch (SQLException throwables) {
             System.out.println(throwables.getMessage());
@@ -45,9 +48,6 @@ public class mainLingo {
                 try (ResultSet rs = statement.executeQuery("SELECT WORD FROM WORD_COLLECTION ORDER BY RAND ( ) LIMIT 1;" )) {
                     rs.next();
                     guessWord = rs.getString(1);
-
-
-
                 }
             }
         } catch (SQLException throwables) {
@@ -136,10 +136,10 @@ public class mainLingo {
     }
 
     public static void main(String[] args) {
-     playOneGame();
+
         //createTable();
 
-
+        playOneGame();
 
     }
 }
