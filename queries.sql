@@ -22,7 +22,7 @@ PRIMARY KEY (USER_ID)
 );
 SELECT COUNT (*) FROM USERS WHERE USERNAME=?;  --jāatceras, ka pirms pārbauda, viss jāpārtaisa CAPSLOCK, savādāk neatradīs
 
-INSERT INTO USERS (USERNAME, NAME, AGE); VALUES ('?', '?', ?); 
+INSERT INTO USERS (USERNAME, NAME, AGE) VALUES ('?', '?', ?);
 
 
 
