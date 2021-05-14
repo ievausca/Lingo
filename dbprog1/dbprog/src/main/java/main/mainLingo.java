@@ -24,6 +24,7 @@ public class mainLingo {
     private static final String INSERTCSV = "INSERT INTO WORD_COLLECTION (WORD) SELECT * FROM CSVREAD('C:\\Users\\Dell\\Desktop\\java\\Lingo\\dbprog1\\dbprog\\src\\main\\java\\main\\5bvardi1.csv')";
     private static final String CREATE_TABLE_RESULTS = "CREATE TABLE IF NOT EXISTS RESULTS  (GAME_ID BIGINT AUTO_INCREMENT,USER_ID BIGINT,WORD_ID BIGINT,PRIMARY KEY (GAME_ID),FOREIGN KEY (USER_ID)  REFERENCES USERS (USER_ID),FOREIGN KEY (WORD_ID) REFERENCES WORD_COLLECTION (WORD_ID),GUESSES Integer,WON Integer);";
     private static final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS USERS  (USER_ID BIGINT AUTO_INCREMENT,USERNAME text NOT NULL,NAME text  NOT NULL,AGE Integer NOT NULL,PRIMARY KEY (USER_ID));";
+    private static final String INSERT_ONLY_ONE_USER = "INSERT INTO USERS (USERNAME, NAME, AGE) VALUES ('ķirbis', 'ķirbis', 115);";
     public static void createTable () {
 
         try (Connection connection = getConnection()) {
@@ -34,6 +35,7 @@ public class mainLingo {
                 statement.executeUpdate(INSERTCSV);
                 statement.executeUpdate(CREATE_TABLE_USERS);
                 statement.executeUpdate(CREATE_TABLE_RESULTS);
+                statement.executeUpdate(INSERT_ONLY_ONE_USER);
             }
         } catch (SQLException throwables) {
             System.out.println(throwables.getMessage());
@@ -56,6 +58,49 @@ public class mainLingo {
         }
         return guessWord;
     }
+
+    public static void insertResults (int user_id, int guesses, int won) {
+        try (Connection connection = getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate("INSERT INTO RESULTS (USER_ID, GUESSES, WON) VALUES (" + user_id + "," + guesses+ ","+ won+ ");");
+                {
+
+                }
+            }
+        } catch (SQLException throwables) {
+            System.out.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }
+    }
+
+    public static void seeResults (int user_id) {
+        final String getNumberOfGames = "SELECT COUNT (GAME_ID) FROM RESULTS WHERE USER_ID =?;";
+        final String getGamesWon = "SELECT COUNT (*) FROM RESULTS WHERE USER_ID=? AND WON=1;";
+
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(getNumberOfGames)) {
+                statement.setString(1, String.valueOf(user_id));
+                try (ResultSet rs = statement.executeQuery()) {
+                    rs.next();
+                    int gamesPlayed = rs.getInt(1);
+                    System.out.println("Tu esi spēlējis " + gamesPlayed + " spēles" );
+                }
+            }
+            try (PreparedStatement statement = connection.prepareStatement(getGamesWon)) {
+                statement.setString(1, String.valueOf(user_id));
+                try (ResultSet rs = statement.executeQuery()) {
+                    rs.next();
+                    int gamesWon = rs.getInt(1);
+                    System.out.println("Tu esi uzvarējis " + gamesWon + " spēlēs" );
+                }
+            }
+        } catch (SQLException throwables) {
+            System.out.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }
+    }
+
 
 
 
@@ -100,12 +145,9 @@ public class mainLingo {
         }
     return stringToPrint.toString();
     }
-    public static String generateGuessWord (){
-        return "lapsa";
-    }
 
 
-    public static void playOneGame () {
+    public static void playOneGame (int user_id) {
         Scanner scanner = new Scanner(System.in);
         String guessWord = getGuessWord().toUpperCase();
         StringBuilder hintWord = new StringBuilder(guessWord);
@@ -126,20 +168,25 @@ public class mainLingo {
             if (guessWord.equals(enteredWord)) {
                 System.out.println(enteredWord.toUpperCase());
                 System.out.println("Tas bija ātri!");
+                insertResults(user_id, i+1, 1 );
                 break;
+
             } else  System.out.println(compareWords(guessWord, enteredWord));
             if (i==4){
+                insertResults(user_id, i+1, 0 );
             System.out.println("Tu mēģināji uzminēt vārdu:");
         System.out.println(guessWord);}
         }
+
 
     }
 
     public static void main(String[] args) {
 
-        //createTable();
+      //  createTable();
 
-        playOneGame();
+        playOneGame(1);
+        seeResults(1);
 
     }
 }
