@@ -6,8 +6,8 @@ Pirmais burts ir zināms.
 Jums šis vārds ir jāuzmin ar pieciem mēģinājumiem.
 Ievadiet savu minējumu ar tastatūras palīdzību un nospiediet taustiņu ENTER. 
 Dators par atbildi dod:
--tik burtu uz sarkana fona, cik ir pareizi uzminētu burtu pareizās vietās 
--tik burtu uz dzeltena fona, cik ir pareizi uzminētu burtu nepareizās vietās. 
+-tik LIELO BURTU, cik ir pareizi uzminētu burtu pareizās vietās 
+-tik mazo burtu, cik ir pareizi uzminētu burtu nepareizās vietās. 
 Labu veiksmi!
 
 
