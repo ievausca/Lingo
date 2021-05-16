@@ -24,7 +24,7 @@ public class mainLingo {
     private static final String INSERTCSV = "INSERT INTO WORD_COLLECTION (WORD) SELECT * FROM CSVREAD('C:\\Users\\Dell\\Desktop\\java\\Lingo\\dbprog1\\dbprog\\src\\main\\java\\main\\5bvardi1.csv')";
     private static final String CREATE_TABLE_RESULTS = "CREATE TABLE IF NOT EXISTS RESULTS  (GAME_ID BIGINT AUTO_INCREMENT,USER_ID BIGINT,WORD_ID BIGINT,PRIMARY KEY (GAME_ID),FOREIGN KEY (USER_ID)  REFERENCES USERS (USER_ID),FOREIGN KEY (WORD_ID) REFERENCES WORD_COLLECTION (WORD_ID),GUESSES Integer,WON Integer);";
     private static final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS USERS  (USER_ID BIGINT AUTO_INCREMENT,USERNAME text NOT NULL,NAME text  NOT NULL,AGE Integer NOT NULL,PRIMARY KEY (USER_ID));";
-    private static final String INSERT_ONLY_ONE_USER = "INSERT INTO USERS (USERNAME, NAME, AGE) VALUES ('ķirbis', 'ķirbis', 115);";
+    private static final String INSERT_ONLY_ONE_USER = "INSERT INTO USERS (USERNAME, NAME, AGE) VALUES ('lapsa', 'lapsa', 13);";
     public static void createTable () {
 
         try (Connection connection = getConnection()) {
@@ -116,34 +116,143 @@ public class mainLingo {
         StringBuilder guessWordBuilder = new StringBuilder(guessWord);
 
 
-
-        for (int i = 0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             char activeChar1 = guessWord.charAt(i);
             char activeChar2 = enteredWord.charAt(i);
             char charToPrint = stringToPrint.charAt(i);
 
-            if (activeChar1==activeChar2) {
+            if (activeChar1 == activeChar2) {
 
                 stringToPrint.setCharAt(i, toUpperCase(activeChar2));
-                guessWord=replaceChar(guessWord,'*', i);
-                enteredWord=replaceChar(enteredWord,'x', i);
+                guessWord = replaceChar(guessWord, '*', i);
+                enteredWord = replaceChar(enteredWord, 'x', i);
             }
 
         }
-        for (int i = 0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             char activeChar1 = guessWord.charAt(i);
             char activeChar2 = enteredWord.charAt(i);
             char charToPrint = stringToPrint.charAt(i);
-            if (guessWord.indexOf(activeChar2)>=0) {
+            if (guessWord.indexOf(activeChar2) >= 0) {
 
                 stringToPrint.setCharAt(i, toLowerCase(activeChar2));
-                guessWord=replaceChar(guessWord,'*', guessWord.indexOf(activeChar2));
-                enteredWord=replaceChar(enteredWord,'x', i);
+                guessWord = replaceChar(guessWord, '*', guessWord.indexOf(activeChar2));
+                enteredWord = replaceChar(enteredWord, 'x', i);
             }
 
 
         }
-    return stringToPrint.toString();
+        return stringToPrint.toString();
+
+
+    }
+    public static int checkIfRegistered (String username) {
+        int registered = 0;
+        final String checkUsername = "SELECT COUNT (*) FROM USERS WHERE USERNAME=?;";
+
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(checkUsername)) {
+                statement.setString(1, username);
+                try (ResultSet rs = statement.executeQuery()) {
+                    rs.next();
+                    registered = rs.getInt(1);
+
+                }
+            }
+        } catch (SQLException throwables) {
+            System.out.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }
+        return registered; }
+
+    public static int getUserId (String username) {
+        int user_id=-1;
+        try (Connection connection = getConnection()) {
+
+        final String getUserId = "SELECT USER_ID FROM USERS WHERE USERNAME=?;";
+        try (PreparedStatement statement = connection.prepareStatement(getUserId)) {
+            statement.setString(1, username);
+            try (ResultSet rs = statement.executeQuery()) {
+                rs.next();
+                user_id = rs.getInt(1);
+            }
+        }
+        } catch (SQLException throwables) {
+            System.out.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }
+
+        return user_id; }
+
+    public static void register (String username, String name, int age) {
+        try (Connection connection = getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate("INSERT INTO USERS (USERNAME, NAME, AGE) VALUES ('"  + username + "','" + name+ "',"+ age+ ");");
+
+            }
+        } catch (SQLException throwables) {
+            System.out.println(throwables.getMessage());
+            throwables.printStackTrace();
+        }
+    }
+    public static int login () {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Kāds ir tavs lietotājvārds?");
+        String username = scanner.nextLine();
+        int registered = checkIfRegistered(username);
+        int user_id=-1;
+        if (registered>0) {
+            user_id = getUserId(username);
+
+        }
+        else if (registered==0) {
+            System.out.println("Tu vēl neesi reģistrējies. Lai reģistrētos, tev būs jāatbild uz 3 jautājumiem.\n 1.Kāds būs tavs lietotājvārds?");
+            username = scanner.nextLine().toUpperCase();
+            System.out.println("2.Kāds ir tavs vārds?");
+            String name = scanner.nextLine().toUpperCase();
+            System.out.println("3.Cik tev gadu?");
+            int age = scanner.nextInt();
+            register(username, name, age);
+            user_id = getUserId(username);
+
+        }
+
+        return user_id;
+
+    }
+
+    public static void whatNext (int user_id) {
+        Scanner scanner = new Scanner(System.in);
+        int userChoice = 0;
+        while (userChoice!=4){
+        System.out.println("\n --Ko vēlies darīt tālāk?-- \n" +
+                "1.Spēlēt Lingo - raksti: 1 \n" +
+                "2.Skatīt savus resultātus - raksti: 2 \n" +
+                "3.Lasīt Lingo noteikumus - raksti: 3 \n" +
+                "4.Beigt spēli - raksti: 4 \n");
+        userChoice = scanner.nextInt();
+
+
+        if (userChoice == 1) {
+            playOneGame(user_id);
+        }
+        if (userChoice == 2) {
+            seeResults(user_id);
+        }
+        if (userChoice == 3) {
+            System.out.println("--Kas ir Lingo?-- \n Dators iedomājas kādu vārdu, kas sastāv no pieciem burtiem. \n Pirmais burts ir zināms. \n Tev šis vārds ir jāuzmin ar pieciem mēģinājumiem. \n Raksti savu minējumu un nospiediet taustiņu ENTER. \n Dators par atbildi dod: \n -tik LIELO BURTU, cik ir pareizi uzminētu burtu pareizās vietās. \n -tik mazo burtu, cik ir pareizi uzminētu burtu nepareizās vietās. \nLabu veiksmi!");
+        }
+        if (userChoice == 4){
+            System.out.println("Paldies par spēli! Tiekamies drīz!");
+
+           // break;
+        }
+        if (userChoice<1 || userChoice>4){
+            System.out.println("Nesapratu tavu izvēli. Mēģini vēlreiz.");
+        }
+    }
     }
 
 
@@ -179,14 +288,18 @@ public class mainLingo {
         }
 
 
+
     }
 
     public static void main(String[] args) {
 
-      //  createTable();
+        System.out.println("--Esi sveicināts LINGO!-- \n\nPirms spēles tev jāielogojas\n");
 
-        playOneGame(1);
-        seeResults(1);
+
+     int user_id = login();
+     whatNext(user_id);
+
+
 
     }
 }
