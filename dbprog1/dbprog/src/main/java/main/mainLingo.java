@@ -209,9 +209,9 @@ public class mainLingo {
         }
         else if (registered==0) {
             System.out.println("Tu vēl neesi reģistrējies. Lai reģistrētos, tev būs jāatbild uz 3 jautājumiem.\n 1.Kāds būs tavs lietotājvārds?");
-            username = scanner.nextLine().toUpperCase();
+            username = scanner.nextLine();
             System.out.println("2.Kāds ir tavs vārds?");
-            String name = scanner.nextLine().toUpperCase();
+            String name = scanner.nextLine();
             System.out.println("3.Cik tev gadu?");
             int age = scanner.nextInt();
             register(username, name, age);
@@ -229,7 +229,7 @@ public class mainLingo {
         while (userChoice!=4){
         System.out.println("\n --Ko vēlies darīt tālāk?-- \n" +
                 "1.Spēlēt Lingo - raksti: 1 \n" +
-                "2.Skatīt savus resultātus - raksti: 2 \n" +
+                "2.Skatīt savus rezultātus - raksti: 2 \n" +
                 "3.Lasīt Lingo noteikumus - raksti: 3 \n" +
                 "4.Beigt spēli - raksti: 4 \n");
         userChoice = scanner.nextInt();
@@ -292,6 +292,7 @@ public class mainLingo {
     }
 
     public static void main(String[] args) {
+
 
         System.out.println("--Esi sveicināts LINGO!-- \n\nPirms spēles tev jāielogojas\n");
 
